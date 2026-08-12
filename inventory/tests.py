@@ -1,9 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
-from django.db.models import ProtectedError
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 
-from .models import Category,Item 
+from .models import Category, Item, TransactionHistory
 
 
 class CategoryModelTests(TestCase):
@@ -124,3 +125,151 @@ class ItemModelTests(TestCase):
 
         with self.assertRaises(ProtectedError):
             self.category.delete()
+
+class TransactionHistoryModelTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="manager",
+            password="test-password",
+        )
+        self.category = Category.objects.create(name="Electronics")
+        self.item = Item.objects.create(
+            category=self.category,
+            name="Laptop",
+            quantity=10,
+            reorder_level=2,
+        )
+
+    def create_transaction(self, **overrides):
+        data = {
+            "item": self.item,
+            "user": self.user,
+            "transaction_type": (
+                TransactionHistory.TransactionType.STOCK_IN
+            ),
+            "quantity_moved": 5,
+        }
+        data.update(overrides)
+        return TransactionHistory.objects.create(**data)
+
+    def test_transaction_can_be_created(self):
+        inventory_transaction = self.create_transaction()
+
+        self.assertIsNotNone(inventory_transaction.pk)
+        self.assertEqual(inventory_transaction.item, self.item)
+        self.assertEqual(inventory_transaction.user, self.user)
+        self.assertEqual(
+            inventory_transaction.transaction_type,
+            TransactionHistory.TransactionType.STOCK_IN,
+        )
+        self.assertEqual(inventory_transaction.quantity_moved, 5)
+        self.assertIsNotNone(inventory_transaction.timestamp)
+
+    def test_string_representation_describes_transaction(self):
+        inventory_transaction = self.create_transaction(
+            transaction_type=(
+                TransactionHistory.TransactionType.STOCK_OUT
+            ),
+            quantity_moved=3,
+        )
+
+        self.assertEqual(
+            str(inventory_transaction),
+            "Laptop - Stock out (3)",
+        )
+
+    def test_related_names_are_available(self):
+        inventory_transaction = self.create_transaction()
+
+        self.assertEqual(
+            self.item.transactions.get(),
+            inventory_transaction,
+        )
+        self.assertEqual(
+            self.user.inventory_transactions.get(),
+            inventory_transaction,
+        )
+
+    def test_transactions_are_ordered_newest_first(self):
+        first = self.create_transaction(quantity_moved=1)
+        second = self.create_transaction(quantity_moved=2)
+
+        transaction_ids = list(
+            TransactionHistory.objects.values_list("id", flat=True)
+        )
+
+        self.assertEqual(transaction_ids, [second.id, first.id])
+
+    def test_quantity_moved_must_be_greater_than_zero(self):
+        inventory_transaction = TransactionHistory(
+            item=self.item,
+            user=self.user,
+            transaction_type=(
+                TransactionHistory.TransactionType.STOCK_IN
+            ),
+            quantity_moved=0,
+        )
+
+        with self.assertRaises(ValidationError):
+            inventory_transaction.full_clean()
+
+    def test_database_rejects_zero_quantity(self):
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                self.create_transaction(quantity_moved=0)
+
+    def test_transaction_type_must_be_valid(self):
+        inventory_transaction = TransactionHistory(
+            item=self.item,
+            user=self.user,
+            transaction_type="BAD",
+            quantity_moved=1,
+        )
+
+        with self.assertRaises(ValidationError):
+            inventory_transaction.full_clean()
+
+    def test_database_rejects_invalid_transaction_type(self):
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                self.create_transaction(transaction_type="BAD")
+
+    def test_existing_transaction_cannot_be_modified(self):
+        inventory_transaction = self.create_transaction(quantity_moved=5)
+        inventory_transaction.quantity_moved = 10
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Transaction history cannot be modified.",
+        ):
+            inventory_transaction.save()
+
+        inventory_transaction.refresh_from_db()
+        self.assertEqual(inventory_transaction.quantity_moved, 5)
+
+    def test_transaction_cannot_be_deleted(self):
+        inventory_transaction = self.create_transaction()
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Transaction history cannot be deleted.",
+        ):
+            inventory_transaction.delete()
+
+        self.assertTrue(
+            TransactionHistory.objects.filter(
+                pk=inventory_transaction.pk
+            ).exists()
+        )
+
+    def test_referenced_item_cannot_be_deleted(self):
+        self.create_transaction()
+
+        with self.assertRaises(ProtectedError):
+            self.item.delete()
+
+    def test_referenced_user_cannot_be_deleted(self):
+        self.create_transaction()
+
+        with self.assertRaises(ProtectedError):
+            self.user.delete()
