@@ -50,12 +50,32 @@ class Item(models.Model):
         return self.quantity <= self.reorder_level
 
 
+class ImmutableTransactionQuerySet(models.QuerySet):
+    error_message = "Transaction history cannot be modified."
+
+    def update(self, **kwargs):
+        raise ValidationError(self.error_message)
+
+    def delete(self):
+        raise ValidationError(
+            "Transaction history cannot be deleted."
+        )
+
+    def bulk_update(self, objs, fields, batch_size=None):
+        raise ValidationError(self.error_message)
+
+
+
+
 
 class TransactionHistory(models.Model):
+    
     class TransactionType(models.TextChoices):
         STOCK_IN = "IN", "Stock in"
         STOCK_OUT = "OUT", "Stock out"
 
+    objects = ImmutableTransactionQuerySet.as_manager()
+    
     item = models.ForeignKey(
         Item,
         on_delete=models.PROTECT,
@@ -70,6 +90,7 @@ class TransactionHistory(models.Model):
         max_length=3,
         choices=TransactionType.choices,
     )
+    
     quantity_moved = models.PositiveIntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 

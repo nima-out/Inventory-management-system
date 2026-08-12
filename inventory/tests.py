@@ -273,3 +273,50 @@ class TransactionHistoryModelTests(TestCase):
 
         with self.assertRaises(ProtectedError):
             self.user.delete()
+
+    def test_queryset_update_is_rejected(self):
+        inventory_transaction = self.create_transaction(quantity_moved=5)
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Transaction history cannot be modified.",
+        ):
+            TransactionHistory.objects.filter(
+                pk=inventory_transaction.pk
+            ).update(quantity_moved=10)
+
+        inventory_transaction.refresh_from_db()
+        self.assertEqual(inventory_transaction.quantity_moved, 5)
+
+    def test_queryset_delete_is_rejected(self):
+        inventory_transaction = self.create_transaction()
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Transaction history cannot be deleted.",
+        ):
+            TransactionHistory.objects.filter(
+                pk=inventory_transaction.pk
+            ).delete()
+
+        self.assertTrue(
+            TransactionHistory.objects.filter(
+                pk=inventory_transaction.pk
+            ).exists()
+        )
+
+    def test_bulk_update_is_rejected(self):
+        inventory_transaction = self.create_transaction(quantity_moved=5)
+        inventory_transaction.quantity_moved = 10
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Transaction history cannot be modified.",
+        ):
+            TransactionHistory.objects.bulk_update(
+                [inventory_transaction],
+                ["quantity_moved"],
+            )
+
+        inventory_transaction.refresh_from_db()
+        self.assertEqual(inventory_transaction.quantity_moved, 5)
