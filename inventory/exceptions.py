@@ -56,3 +56,15 @@ class DuplicateItemNameError(CatalogError):
 
 class InvalidReorderLevelError(CatalogError):
     pass
+
+
+class InventorySelectorError(Exception):
+    """Base error for invalid inventory query filters."""
+
+
+class InvalidStockStatusError(InventorySelectorError):
+    pass
+
+
+class InvalidDateRangeError(InventorySelectorError):
+    pass
