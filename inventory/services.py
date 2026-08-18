@@ -121,6 +121,11 @@ def record_inventory_movement(
             pk=item.pk,
             is_active=True,
         )._increase_quantity(quantity)
+
+        if updated_rows == 0:
+            raise InactiveItemError(
+                "The item became unavailable during the movement."
+            )
     else:
         updated_rows = Item.objects.filter(
             pk=item.pk,
@@ -128,14 +133,18 @@ def record_inventory_movement(
         )._decrease_quantity_if_available(quantity)
 
         if updated_rows == 0:
+            item_is_active = Item.objects.filter(
+                pk=item.pk,
+                is_active=True,
+            ).exists()
+            if not item_is_active:
+                raise InactiveItemError(
+                    "The item became unavailable during the movement."
+                )
+
             raise InsufficientStockError(
                 "There is not enough stock for this movement."
             )
-
-    if updated_rows == 0:
-        raise InactiveItemError(
-            "The item became unavailable during the movement."
-        )
 
     item.refresh_from_db(fields=["quantity"])
 

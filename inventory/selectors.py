@@ -1,4 +1,8 @@
+from datetime import date, datetime, time
+
+from django.conf import settings
 from django.db.models import Count, F, Q, Sum
+from django.utils import timezone
 
 from .exceptions import (
     InvalidDateRangeError,
@@ -17,6 +21,26 @@ _STOCK_STATUS_FILTERS = {
     STOCK_STATUS_OUT: Q(quantity=0),
     STOCK_STATUS_HEALTHY: Q(quantity__gt=F("reorder_level")),
 }
+
+
+def _normalize_history_bound(value, *, is_end):
+    if isinstance(value, datetime):
+        normalized_value = value
+    elif isinstance(value, date):
+        boundary_time = time.max if is_end else time.min
+        normalized_value = datetime.combine(value, boundary_time)
+    else:
+        raise InvalidDateRangeError(
+            "History bounds must be date or datetime values."
+        )
+
+    if settings.USE_TZ and timezone.is_naive(normalized_value):
+        normalized_value = timezone.make_aware(
+            normalized_value,
+            timezone.get_current_timezone(),
+        )
+
+    return normalized_value
 
 
 def get_inventory_summary():
@@ -93,18 +117,16 @@ def list_transaction_history(
             "Transaction type must be IN or OUT."
         )
 
-    if start is not None and end is not None:
-        try:
-            is_reversed = start > end
-        except TypeError as error:
-            raise InvalidDateRangeError(
-                "Start and end must be comparable date or datetime values."
-            ) from error
+    if start is not None:
+        start = _normalize_history_bound(start, is_end=False)
 
-        if is_reversed:
-            raise InvalidDateRangeError(
-                "Start must be earlier than or equal to end."
-            )
+    if end is not None:
+        end = _normalize_history_bound(end, is_end=True)
+
+    if start is not None and end is not None and start > end:
+        raise InvalidDateRangeError(
+            "Start must be earlier than or equal to end."
+        )
 
     history = TransactionHistory.objects.select_related(
         "item",

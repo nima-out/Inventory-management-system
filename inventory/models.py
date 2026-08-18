@@ -44,11 +44,30 @@ class ItemQuerySet(models.QuerySet):
             batch_size=batch_size,
         )
 
-    def bulk_create(self, objs, *args, **kwargs):
+    def bulk_create(
+        self,
+        objs,
+        batch_size=None,
+        ignore_conflicts=False,
+        update_conflicts=False,
+        update_fields=None,
+        unique_fields=None,
+    ):
+        objs = list(objs)
         if any(item.quantity != 0 for item in objs):
             raise ValidationError(self.quantity_error_message)
 
-        return super().bulk_create(objs, *args, **kwargs)
+        if update_conflicts and "quantity" in (update_fields or ()):
+            raise ValidationError(self.quantity_error_message)
+
+        return super().bulk_create(
+            objs,
+            batch_size=batch_size,
+            ignore_conflicts=ignore_conflicts,
+            update_conflicts=update_conflicts,
+            update_fields=update_fields,
+            unique_fields=unique_fields,
+        )
 
     def delete(self):
         raise ValidationError(self.deletion_error_message)
@@ -145,6 +164,28 @@ class ImmutableTransactionQuerySet(models.QuerySet):
 
     def bulk_update(self, objs, fields, batch_size=None):
         raise ValidationError(self.error_message)
+
+    def bulk_create(
+        self,
+        objs,
+        batch_size=None,
+        ignore_conflicts=False,
+        update_conflicts=False,
+        update_fields=None,
+        unique_fields=None,
+    ):
+        if update_conflicts:
+            raise ValidationError(self.error_message)
+
+        return super().bulk_create(
+            objs,
+            batch_size=batch_size,
+            ignore_conflicts=ignore_conflicts,
+            update_conflicts=update_conflicts,
+            update_fields=update_fields,
+            unique_fields=unique_fields,
+        )
+
 
 class TransactionHistory(models.Model):
     class TransactionType(models.TextChoices):
