@@ -1,0 +1,102 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">Catalog</div>
+        <h1>Inventory</h1>
+        <p class="muted">Search the catalog and review current stock levels.</p>
+    </div>
+</div>
+
+<section class="card filter-card" aria-labelledby="inventory-filters-title">
+    <h2 class="visually-hidden" id="inventory-filters-title">Inventory filters</h2>
+    <form method="get">
+        <div class="filter-grid filter-grid-items">
+            <div class="form-field">
+                <label for="{{ form.query.id_for_label }}">{{ form.query.label }}</label>
+                {{ form.query }}
+                {{ form.query.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.category.id_for_label }}">Category</label>
+                {{ form.category }}
+                {{ form.category.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.stock_status.id_for_label }}">Stock status</label>
+                {{ form.stock_status }}
+                {{ form.stock_status.errors }}
+            </div>
+            <label class="check-field" for="{{ form.include_inactive.id_for_label }}">
+                {{ form.include_inactive }}
+                <span>Include inactive items</span>
+            </label>
+            <div class="filter-actions">
+                <button class="button button-primary" type="submit">Apply filters</button>
+                <a class="button button-quiet" href="{% url 'inventory:item-list' %}">Clear</a>
+            </div>
+        </div>
+    </form>
+</section>
+
+<section class="card table-card" aria-labelledby="inventory-results-title">
+    <div class="card-heading">
+        <div>
+            <h2 id="inventory-results-title">Items</h2>
+            <p class="muted">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</p>
+        </div>
+    </div>
+
+    {% if page_obj.object_list %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Item</th>
+                        <th scope="col">Category</th>
+                        <th scope="col" class="number-cell">On hand</th>
+                        <th scope="col" class="number-cell">Reorder at</th>
+                        <th scope="col">Stock status</th>
+                        <th scope="col">Catalog state</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in page_obj %}
+                        <tr>
+                            <td class="item-name">{{ item.name }}</td>
+                            <td>{{ item.category.name }}</td>
+                            <td class="number-cell">{{ item.quantity }}</td>
+                            <td class="number-cell">{{ item.reorder_level }}</td>
+                            <td>
+                                {% if item.quantity == 0 %}
+                                    <span class="status status-out">Out of stock</span>
+                                {% elif item.is_low_stock %}
+                                    <span class="status status-low">Low stock</span>
+                                {% else %}
+                                    <span class="status status-healthy">Healthy</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if item.is_active %}
+                                    <span class="status status-active">Active</span>
+                                {% else %}
+                                    <span class="status status-inactive">Inactive</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "inventory/includes/pagination.html" %}
+    {% else %}
+        <div class="empty-state">
+            <h3>No items found</h3>
+            <p>Try changing or clearing the filters.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

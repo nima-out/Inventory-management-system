@@ -1,0 +1,101 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Transaction history{% endblock %}
+
+{% block content %}
+<div class="page-heading">
+    <div>
+        <div class="eyebrow">Audit trail</div>
+        <h1>Transaction history</h1>
+        <p class="muted">Review the immutable record of inventory movements.</p>
+    </div>
+</div>
+
+<section class="card filter-card" aria-labelledby="history-filters-title">
+    <h2 class="visually-hidden" id="history-filters-title">Transaction history filters</h2>
+    <form method="get">
+        {{ form.non_field_errors }}
+        <div class="filter-grid filter-grid-history">
+            <div class="form-field">
+                <label for="{{ form.item.id_for_label }}">Item</label>
+                {{ form.item }}
+                {{ form.item.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.user.id_for_label }}">User</label>
+                {{ form.user }}
+                {{ form.user.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.transaction_type.id_for_label }}">Type</label>
+                {{ form.transaction_type }}
+                {{ form.transaction_type.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.start.id_for_label }}">{{ form.start.label }}</label>
+                {{ form.start }}
+                {{ form.start.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.end.id_for_label }}">{{ form.end.label }}</label>
+                {{ form.end }}
+                {{ form.end.errors }}
+            </div>
+            <div class="filter-actions">
+                <button class="button button-primary" type="submit">Apply filters</button>
+                <a class="button button-quiet" href="{% url 'inventory:transaction-history' %}">Clear</a>
+            </div>
+        </div>
+    </form>
+</section>
+
+<section class="card table-card" aria-labelledby="history-results-title">
+    <div class="card-heading">
+        <div>
+            <h2 id="history-results-title">Movements</h2>
+            <p class="muted">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</p>
+        </div>
+    </div>
+
+    {% if page_obj.object_list %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Date and time</th>
+                        <th scope="col">Item</th>
+                        <th scope="col">Category</th>
+                        <th scope="col">User</th>
+                        <th scope="col">Type</th>
+                        <th scope="col" class="number-cell">Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transaction in page_obj %}
+                        <tr>
+                            <td class="nowrap">{{ transaction.timestamp|date:"Y-m-d H:i" }}</td>
+                            <td class="item-name">{{ transaction.item.name }}</td>
+                            <td>{{ transaction.item.category.name }}</td>
+                            <td>{{ transaction.user.get_username }}</td>
+                            <td>
+                                {% if transaction.transaction_type == "IN" %}
+                                    <span class="status status-in">Stock in</span>
+                                {% else %}
+                                    <span class="status status-out">Stock out</span>
+                                {% endif %}
+                            </td>
+                            <td class="number-cell">{{ transaction.quantity_moved }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% include "inventory/includes/pagination.html" %}
+    {% else %}
+        <div class="empty-state">
+            <h3>No transactions found</h3>
+            <p>There are no movements matching these filters.</p>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

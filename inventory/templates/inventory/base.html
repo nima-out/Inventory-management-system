@@ -1,0 +1,57 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Inventory{% endblock %} | Stockroom</title>
+    <link rel="stylesheet" href="{% static 'inventory/css/site.css' %}">
+</head>
+<body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+
+    <header class="site-header">
+        <div class="header-inner">
+            <a class="brand" href="{% url 'inventory:dashboard' %}" aria-label="Stockroom dashboard">
+                <span class="brand-mark" aria-hidden="true">S</span>
+                <span>Stockroom</span>
+            </a>
+
+            {% if user.is_authenticated %}
+                <nav class="primary-nav" aria-label="Primary navigation">
+                    {% if perms.inventory.view_item %}
+                        <a href="{% url 'inventory:dashboard' %}">Dashboard</a>
+                        <a href="{% url 'inventory:item-list' %}">Inventory</a>
+                    {% endif %}
+                    {% if perms.inventory.view_transactionhistory %}
+                        <a href="{% url 'inventory:transaction-history' %}">History</a>
+                    {% endif %}
+                    {% if user.is_staff %}
+                        <a href="{% url 'admin:index' %}">Admin</a>
+                    {% endif %}
+                </nav>
+
+                <div class="account-menu">
+                    <span class="username">{{ user.get_username }}</span>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button class="button button-quiet" type="submit">Log out</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="page-shell" id="main-content">
+        {% if messages %}
+            <div class="messages" aria-live="polite">
+                {% for message in messages %}
+                    <div class="message">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>
