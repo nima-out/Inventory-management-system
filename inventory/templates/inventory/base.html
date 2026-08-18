@@ -31,6 +31,13 @@
                             {% if request.resolver_match.view_name == 'inventory:item-list' %}aria-current="page"{% endif %}
                         >Items</a>
                     {% endif %}
+                    {% if perms.inventory.record_inventory_movement %}
+                        <a
+                            class="nav-link{% if request.resolver_match.view_name == 'inventory:record-movement' %} is-active{% endif %}"
+                            href="{% url 'inventory:record-movement' %}"
+                            {% if request.resolver_match.view_name == 'inventory:record-movement' %}aria-current="page"{% endif %}
+                        >Move stock</a>
+                    {% endif %}
                     {% if perms.inventory.view_transactionhistory %}
                         <a
                             class="nav-link{% if request.resolver_match.view_name == 'inventory:transaction-history' %} is-active{% endif %}"
@@ -64,7 +71,7 @@
                 {% if messages %}
                     <div class="messages" aria-live="polite">
                         {% for message in messages %}
-                            <div class="message">{{ message }}</div>
+                            <div class="message{% if message.tags %} message-{{ message.tags }}{% endif %}">{{ message }}</div>
                         {% endfor %}
                     </div>
                 {% endif %}

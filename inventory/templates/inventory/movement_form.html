@@ -1,0 +1,55 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Record movement{% endblock %}
+
+{% block content %}
+<header class="page-heading">
+    <div>
+        <h1>Record movement</h1>
+        <p>Add or remove stock. Every movement becomes part of the permanent history.</p>
+    </div>
+</header>
+
+<section class="movement-sheet" aria-labelledby="movement-details-title">
+    <div class="movement-sheet-heading">
+        <div>
+            <h2 id="movement-details-title">Movement details</h2>
+            <p>Active items show their current quantity on hand.</p>
+        </div>
+        <span>Permanent record</span>
+    </div>
+
+    <form method="post" class="movement-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="form-field">
+            <label for="{{ form.item.id_for_label }}">{{ form.item.label }}</label>
+            {{ form.item }}
+            {{ form.item.errors }}
+        </div>
+
+        <div class="movement-form-row">
+            <div class="form-field">
+                <label for="{{ form.transaction_type.id_for_label }}">{{ form.transaction_type.label }}</label>
+                {{ form.transaction_type }}
+                {{ form.transaction_type.errors }}
+            </div>
+            <div class="form-field">
+                <label for="{{ form.quantity.id_for_label }}">{{ form.quantity.label }}</label>
+                {{ form.quantity }}
+                {{ form.quantity.errors }}
+            </div>
+        </div>
+
+        <p class="movement-guidance">
+            Stock out cannot exceed the quantity on hand. Archived items cannot receive movements.
+        </p>
+
+        <div class="movement-actions">
+            <button class="button button-primary" type="submit">Record movement</button>
+            <a class="button button-quiet" href="{% url 'inventory:item-list' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

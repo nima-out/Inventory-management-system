@@ -9,6 +9,33 @@ from .selectors import (
 )
 
 
+class MovementItemChoiceField(forms.ModelChoiceField):
+    def label_from_instance(self, item):
+        return (
+            f"{item.name} — {item.category.name} "
+            f"({item.quantity} on hand)"
+        )
+
+
+class InventoryMovementForm(forms.Form):
+    item = MovementItemChoiceField(
+        queryset=Item.objects.filter(is_active=True)
+        .select_related("category")
+        .order_by("category__name", "name"),
+        empty_label="Select an active item",
+    )
+    transaction_type = forms.ChoiceField(
+        label="Movement",
+        choices=TransactionHistory.TransactionType.choices,
+    )
+    quantity = forms.IntegerField(
+        min_value=1,
+        widget=forms.NumberInput(
+            attrs={"min": 1, "inputmode": "numeric"}
+        ),
+    )
+
+
 class ItemSearchForm(forms.Form):
     query = forms.CharField(
         label="Item name",

@@ -498,6 +498,69 @@ h3 {
     gap: 0.35rem;
 }
 
+.movement-sheet {
+    width: min(100%, 680px);
+    border: 1px solid var(--hairline);
+    border-top: 2px solid var(--cobalt);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+}
+
+.movement-sheet-heading {
+    display: flex;
+    min-height: 72px;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--hairline);
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.movement-sheet-heading h2 {
+    margin-bottom: 0.15rem;
+}
+
+.movement-sheet-heading p {
+    margin-bottom: 0;
+    color: var(--slate);
+    font-size: 0.8rem;
+}
+
+.movement-sheet-heading > span {
+    color: var(--slate);
+    font-family: var(--data-font);
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+
+.movement-form {
+    display: grid;
+    padding: 1.2rem;
+    gap: 1rem;
+}
+
+.movement-form-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 0.55fr);
+    gap: 0.8rem;
+}
+
+.movement-guidance {
+    margin: 0;
+    padding: 0.7rem 0.8rem;
+    border-left: 2px solid var(--hairline-strong);
+    color: var(--slate);
+    background: var(--surface-subtle);
+    font-size: 0.78rem;
+}
+
+.movement-actions {
+    display: flex;
+    padding-top: 0.2rem;
+    gap: 0.4rem;
+}
+
 .table-wrap {
     width: 100%;
     overflow: auto;
@@ -551,6 +614,20 @@ tbody tr:hover {
 
 .number-cell {
     text-align: right;
+}
+
+.table-action {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.row-action {
+    font-size: 0.78rem;
+}
+
+.table-action-empty {
+    color: var(--hairline-strong);
+    font-family: var(--data-font);
 }
 
 .nowrap {
@@ -644,6 +721,12 @@ tbody tr:hover {
     color: var(--out);
     background: #fff7f6;
     font-size: 0.82rem;
+}
+
+.message-success {
+    border-color: #a9c9bb;
+    color: var(--healthy);
+    background: #f4faf7;
 }
 
 .public-shell {
@@ -833,7 +916,8 @@ tbody tr:hover {
     }
 
     .page-heading,
-    .panel-heading {
+    .panel-heading,
+    .movement-sheet-heading {
         align-items: flex-start;
         flex-direction: column;
     }
@@ -856,6 +940,14 @@ tbody tr:hover {
     }
 
     .filter-actions .button {
+        flex: 1;
+    }
+
+    .movement-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .movement-actions .button {
         flex: 1;
     }
 
