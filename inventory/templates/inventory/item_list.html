@@ -1,19 +1,17 @@
 {% extends "inventory/base.html" %}
 
-{% block title %}Inventory{% endblock %}
+{% block title %}Items{% endblock %}
 
 {% block content %}
-<div class="page-heading">
+<header class="page-heading">
     <div>
-        <div class="eyebrow">Catalog</div>
-        <h1>Inventory</h1>
-        <p class="muted">Search the catalog and review current stock levels.</p>
+        <h1>Items</h1>
+        <p>Search the catalog and review current stock.</p>
     </div>
-</div>
+</header>
 
-<section class="card filter-card" aria-labelledby="inventory-filters-title">
-    <h2 class="visually-hidden" id="inventory-filters-title">Inventory filters</h2>
-    <form method="get">
+<section class="workspace-panel" aria-labelledby="inventory-results-title">
+    <form method="get" class="filter-bar" aria-label="Inventory filters">
         <div class="filter-grid filter-grid-items">
             <div class="form-field">
                 <label for="{{ form.query.id_for_label }}">{{ form.query.label }}</label>
@@ -32,22 +30,18 @@
             </div>
             <label class="check-field" for="{{ form.include_inactive.id_for_label }}">
                 {{ form.include_inactive }}
-                <span>Include inactive items</span>
+                <span>Include inactive</span>
             </label>
             <div class="filter-actions">
-                <button class="button button-primary" type="submit">Apply filters</button>
+                <button class="button button-primary" type="submit">Apply</button>
                 <a class="button button-quiet" href="{% url 'inventory:item-list' %}">Clear</a>
             </div>
         </div>
     </form>
-</section>
 
-<section class="card table-card" aria-labelledby="inventory-results-title">
-    <div class="card-heading">
-        <div>
-            <h2 id="inventory-results-title">Items</h2>
-            <p class="muted">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</p>
-        </div>
+    <div class="results-heading">
+        <h2 id="inventory-results-title">Catalog</h2>
+        <span>{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</span>
     </div>
 
     {% if page_obj.object_list %}
@@ -68,22 +62,37 @@
                         <tr>
                             <td class="item-name">{{ item.name }}</td>
                             <td>{{ item.category.name }}</td>
-                            <td class="number-cell">{{ item.quantity }}</td>
-                            <td class="number-cell">{{ item.reorder_level }}</td>
+                            <td class="number-cell data-value">{{ item.quantity }}</td>
+                            <td class="number-cell data-value">{{ item.reorder_level }}</td>
                             <td>
                                 {% if item.quantity == 0 %}
-                                    <span class="status status-out">Out of stock</span>
+                                    <span class="status status-out">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Out of stock
+                                    </span>
                                 {% elif item.is_low_stock %}
-                                    <span class="status status-low">Low stock</span>
+                                    <span class="status status-low">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Low stock
+                                    </span>
                                 {% else %}
-                                    <span class="status status-healthy">Healthy</span>
+                                    <span class="status status-healthy">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Healthy
+                                    </span>
                                 {% endif %}
                             </td>
                             <td>
                                 {% if item.is_active %}
-                                    <span class="status status-active">Active</span>
+                                    <span class="status status-active">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Active
+                                    </span>
                                 {% else %}
-                                    <span class="status status-inactive">Inactive</span>
+                                    <span class="status status-inactive">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Inactive
+                                    </span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -95,7 +104,7 @@
     {% else %}
         <div class="empty-state">
             <h3>No items found</h3>
-            <p>Try changing or clearing the filters.</p>
+            <p>Change or clear the filters to see more items.</p>
         </div>
     {% endif %}
 </section>

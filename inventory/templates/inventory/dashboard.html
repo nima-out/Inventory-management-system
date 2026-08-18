@@ -1,47 +1,48 @@
 {% extends "inventory/base.html" %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Overview{% endblock %}
 
 {% block content %}
-<div class="page-heading">
+<header class="page-heading">
     <div>
-        <div class="eyebrow">Overview</div>
-        <h1>Inventory dashboard</h1>
-        <p class="muted">A current snapshot of active stock.</p>
+        <h1>Overview</h1>
+        <p>Current stock across the active catalog.</p>
     </div>
-    <a class="button button-secondary" href="{% url 'inventory:item-list' %}">View all inventory</a>
-</div>
+    <a class="button button-secondary" href="{% url 'inventory:item-list' %}">Open items</a>
+</header>
 
-<section class="stat-grid" aria-label="Inventory summary">
-    <article class="stat-card stat-card-blue">
-        <span class="stat-label">Active SKUs</span>
+<section class="ledger-summary" aria-label="Inventory summary">
+    <article class="ledger-metric">
+        <span class="metric-label">Active SKUs</span>
         <strong>{{ summary.active_sku_count }}</strong>
-        <span class="stat-note">Items in the active catalog</span>
     </article>
-    <article class="stat-card stat-card-indigo">
-        <span class="stat-label">Total units</span>
+    <article class="ledger-metric">
+        <span class="metric-label">Units on hand</span>
         <strong>{{ summary.total_units }}</strong>
-        <span class="stat-note">Units currently on hand</span>
     </article>
-    <article class="stat-card stat-card-amber">
-        <span class="stat-label">Low stock</span>
+    <article class="ledger-metric ledger-metric-low">
+        <span class="metric-label">
+            <span class="status-dot" aria-hidden="true"></span>
+            Low stock
+        </span>
         <strong>{{ summary.low_stock_count }}</strong>
-        <span class="stat-note">At or below reorder level</span>
     </article>
-    <article class="stat-card stat-card-red">
-        <span class="stat-label">Out of stock</span>
+    <article class="ledger-metric ledger-metric-out">
+        <span class="metric-label">
+            <span class="status-dot" aria-hidden="true"></span>
+            Out of stock
+        </span>
         <strong>{{ summary.out_of_stock_count }}</strong>
-        <span class="stat-note">Items with zero units</span>
     </article>
 </section>
 
-<section class="card table-card" aria-labelledby="low-stock-title">
-    <div class="card-heading">
+<section class="workspace-panel" aria-labelledby="low-stock-title">
+    <div class="panel-heading">
         <div>
-            <h2 id="low-stock-title">Low-stock items</h2>
-            <p class="muted">The first ten active items needing attention.</p>
+            <h2 id="low-stock-title">Items requiring attention</h2>
+            <p>Active items at or below their reorder level.</p>
         </div>
-        <a href="{% url 'inventory:item-list' %}?stock_status=low">See all low stock</a>
+        <a href="{% url 'inventory:item-list' %}?stock_status=low">View all</a>
     </div>
 
     {% if low_stock_items %}
@@ -61,13 +62,19 @@
                         <tr>
                             <td class="item-name">{{ item.name }}</td>
                             <td>{{ item.category.name }}</td>
-                            <td class="number-cell">{{ item.quantity }}</td>
-                            <td class="number-cell">{{ item.reorder_level }}</td>
+                            <td class="number-cell data-value">{{ item.quantity }}</td>
+                            <td class="number-cell data-value">{{ item.reorder_level }}</td>
                             <td>
                                 {% if item.quantity == 0 %}
-                                    <span class="status status-out">Out of stock</span>
+                                    <span class="status status-out">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Out of stock
+                                    </span>
                                 {% else %}
-                                    <span class="status status-low">Low stock</span>
+                                    <span class="status status-low">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Low stock
+                                    </span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -77,8 +84,8 @@
         </div>
     {% else %}
         <div class="empty-state">
-            <h3>Stock levels look healthy</h3>
-            <p>No active items are at or below their reorder level.</p>
+            <h3>No low-stock items</h3>
+            <p>All active items are above their reorder level.</p>
         </div>
     {% endif %}
 </section>

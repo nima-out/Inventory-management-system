@@ -1,23 +1,22 @@
 {% extends "inventory/base.html" %}
 
-{% block title %}Log in{% endblock %}
+{% block title %}Sign in{% endblock %}
 
 {% block content %}
 <section class="login-shell" aria-labelledby="login-title">
-    <div class="login-card">
-        <div class="eyebrow">Inventory management</div>
-        <h1 id="login-title">Welcome back</h1>
-        <p class="muted">Sign in to view stock levels and movement history.</p>
+    <div class="login-panel">
+        <h1 id="login-title">Sign in to Stockroom</h1>
+        <p>Use your inventory account.</p>
 
         {% if form.errors %}
             <div class="form-alert" role="alert">
-                Your username or password was not recognized. Please try again.
+                The username or password is incorrect.
             </div>
         {% endif %}
 
         {% if next and user.is_authenticated %}
             <div class="form-alert" role="alert">
-                Your account does not have permission to view that page.
+                Your account cannot access that page.
             </div>
         {% endif %}
 
@@ -35,7 +34,7 @@
                 {{ form.password }}
             </div>
 
-            <button class="button button-primary button-full" type="submit">Log in</button>
+            <button class="button button-primary button-full" type="submit">Sign in</button>
         </form>
     </div>
 </section>

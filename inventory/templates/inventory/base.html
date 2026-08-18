@@ -10,48 +10,68 @@
 <body>
     <a class="skip-link" href="#main-content">Skip to content</a>
 
-    <header class="site-header">
-        <div class="header-inner">
-            <a class="brand" href="{% url 'inventory:dashboard' %}" aria-label="Stockroom dashboard">
-                <span class="brand-mark" aria-hidden="true">S</span>
-                <span>Stockroom</span>
-            </a>
+    <div class="{% if user.is_authenticated %}app-shell{% else %}public-shell{% endif %}">
+        {% if user.is_authenticated %}
+            <aside class="sidebar">
+                <div class="sidebar-head">
+                    <a class="brand" href="{% url 'inventory:dashboard' %}">Stockroom</a>
+                    <span class="brand-description">Inventory control</span>
+                </div>
 
-            {% if user.is_authenticated %}
-                <nav class="primary-nav" aria-label="Primary navigation">
+                <nav class="sidebar-nav" aria-label="Primary navigation">
                     {% if perms.inventory.view_item %}
-                        <a href="{% url 'inventory:dashboard' %}">Dashboard</a>
-                        <a href="{% url 'inventory:item-list' %}">Inventory</a>
+                        <a
+                            class="nav-link{% if request.resolver_match.view_name == 'inventory:dashboard' %} is-active{% endif %}"
+                            href="{% url 'inventory:dashboard' %}"
+                            {% if request.resolver_match.view_name == 'inventory:dashboard' %}aria-current="page"{% endif %}
+                        >Overview</a>
+                        <a
+                            class="nav-link{% if request.resolver_match.view_name == 'inventory:item-list' %} is-active{% endif %}"
+                            href="{% url 'inventory:item-list' %}"
+                            {% if request.resolver_match.view_name == 'inventory:item-list' %}aria-current="page"{% endif %}
+                        >Items</a>
                     {% endif %}
                     {% if perms.inventory.view_transactionhistory %}
-                        <a href="{% url 'inventory:transaction-history' %}">History</a>
+                        <a
+                            class="nav-link{% if request.resolver_match.view_name == 'inventory:transaction-history' %} is-active{% endif %}"
+                            href="{% url 'inventory:transaction-history' %}"
+                            {% if request.resolver_match.view_name == 'inventory:transaction-history' %}aria-current="page"{% endif %}
+                        >History</a>
                     {% endif %}
                     {% if user.is_staff %}
-                        <a href="{% url 'admin:index' %}">Admin</a>
+                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
                     {% endif %}
                 </nav>
 
-                <div class="account-menu">
-                    <span class="username">{{ user.get_username }}</span>
+                <div class="sidebar-footer">
+                    <span class="account-label">Signed in as</span>
+                    <strong class="username">{{ user.get_username }}</strong>
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
-                        <button class="button button-quiet" type="submit">Log out</button>
+                        <button class="text-button" type="submit">Log out</button>
                     </form>
                 </div>
-            {% endif %}
-        </div>
-    </header>
-
-    <main class="page-shell" id="main-content">
-        {% if messages %}
-            <div class="messages" aria-live="polite">
-                {% for message in messages %}
-                    <div class="message">{{ message }}</div>
-                {% endfor %}
-            </div>
+            </aside>
+        {% else %}
+            <header class="public-header">
+                <a class="brand" href="{% url 'login' %}">Stockroom</a>
+                <span class="brand-description">Inventory control</span>
+            </header>
         {% endif %}
 
-        {% block content %}{% endblock %}
-    </main>
+        <main class="{% if user.is_authenticated %}workspace{% else %}public-workspace{% endif %}" id="main-content">
+            <div class="content-frame">
+                {% if messages %}
+                    <div class="messages" aria-live="polite">
+                        {% for message in messages %}
+                            <div class="message">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
 </body>
 </html>

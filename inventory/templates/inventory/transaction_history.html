@@ -1,19 +1,17 @@
 {% extends "inventory/base.html" %}
 
-{% block title %}Transaction history{% endblock %}
+{% block title %}Movement history{% endblock %}
 
 {% block content %}
-<div class="page-heading">
+<header class="page-heading">
     <div>
-        <div class="eyebrow">Audit trail</div>
-        <h1>Transaction history</h1>
-        <p class="muted">Review the immutable record of inventory movements.</p>
+        <h1>Movement history</h1>
+        <p>Inventory changes, newest first.</p>
     </div>
-</div>
+</header>
 
-<section class="card filter-card" aria-labelledby="history-filters-title">
-    <h2 class="visually-hidden" id="history-filters-title">Transaction history filters</h2>
-    <form method="get">
+<section class="workspace-panel" aria-labelledby="history-results-title">
+    <form method="get" class="filter-bar" aria-label="Transaction history filters">
         {{ form.non_field_errors }}
         <div class="filter-grid filter-grid-history">
             <div class="form-field">
@@ -42,19 +40,15 @@
                 {{ form.end.errors }}
             </div>
             <div class="filter-actions">
-                <button class="button button-primary" type="submit">Apply filters</button>
+                <button class="button button-primary" type="submit">Apply</button>
                 <a class="button button-quiet" href="{% url 'inventory:transaction-history' %}">Clear</a>
             </div>
         </div>
     </form>
-</section>
 
-<section class="card table-card" aria-labelledby="history-results-title">
-    <div class="card-heading">
-        <div>
-            <h2 id="history-results-title">Movements</h2>
-            <p class="muted">{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</p>
-        </div>
+    <div class="results-heading">
+        <h2 id="history-results-title">Transactions</h2>
+        <span>{{ page_obj.paginator.count }} result{{ page_obj.paginator.count|pluralize }}</span>
     </div>
 
     {% if page_obj.object_list %}
@@ -73,18 +67,28 @@
                 <tbody>
                     {% for transaction in page_obj %}
                         <tr>
-                            <td class="nowrap">{{ transaction.timestamp|date:"Y-m-d H:i" }}</td>
+                            <td class="nowrap data-value">{{ transaction.timestamp|date:"Y-m-d H:i" }}</td>
                             <td class="item-name">{{ transaction.item.name }}</td>
                             <td>{{ transaction.item.category.name }}</td>
                             <td>{{ transaction.user.get_username }}</td>
                             <td>
                                 {% if transaction.transaction_type == "IN" %}
-                                    <span class="status status-in">Stock in</span>
+                                    <span class="status status-in">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Stock in
+                                    </span>
                                 {% else %}
-                                    <span class="status status-out">Stock out</span>
+                                    <span class="status status-out">
+                                        <span class="status-dot" aria-hidden="true"></span>
+                                        Stock out
+                                    </span>
                                 {% endif %}
                             </td>
-                            <td class="number-cell">{{ transaction.quantity_moved }}</td>
+                            {% if transaction.transaction_type == "IN" %}
+                                <td class="number-cell movement-quantity movement-in">+{{ transaction.quantity_moved }}</td>
+                            {% else %}
+                                <td class="number-cell movement-quantity movement-out">&minus;{{ transaction.quantity_moved }}</td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -94,7 +98,7 @@
     {% else %}
         <div class="empty-state">
             <h3>No transactions found</h3>
-            <p>There are no movements matching these filters.</p>
+            <p>Change or clear the filters to see more movements.</p>
         </div>
     {% endif %}
 </section>
