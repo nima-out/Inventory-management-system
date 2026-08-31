@@ -1,0 +1,71 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<header class="page-heading">
+    <div>
+        <h1>Categories</h1>
+        <p>Review the groups used to organize inventory.</p>
+    </div>
+    {% if perms.inventory.add_category %}
+        <div class="page-actions">
+            <a class="button button-primary" href="{% url 'inventory:category-create' %}">Add category</a>
+        </div>
+    {% endif %}
+</header>
+
+<section class="workspace-panel" aria-labelledby="category-register-title">
+    <div class="results-heading">
+        <h2 id="category-register-title">Category register</h2>
+        <span>{{ categories|length }} categor{{ categories|length|pluralize:"y,ies" }}</span>
+    </div>
+
+    {% if categories %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">Category</th>
+                        <th scope="col" class="number-cell">Assigned items</th>
+                        {% if perms.inventory.change_category or perms.inventory.delete_category %}
+                            <th scope="col" class="table-action">
+                                <span class="visually-hidden">Actions</span>
+                            </th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for category in categories %}
+                        <tr>
+                            <td class="item-name">{{ category.name }}</td>
+                            <td class="number-cell data-value">{{ category.item_count }}</td>
+                            {% if perms.inventory.change_category or perms.inventory.delete_category %}
+                                <td class="table-action">
+                                    <div class="row-actions">
+                                        {% if perms.inventory.change_category %}
+                                            <a class="row-action" href="{% url 'inventory:category-update' category_id=category.pk %}">Rename</a>
+                                        {% endif %}
+                                        {% if perms.inventory.delete_category %}
+                                            <a class="row-action row-action-danger" href="{% url 'inventory:category-delete' category_id=category.pk %}">Delete</a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No categories yet</h3>
+            {% if perms.inventory.add_category %}
+                <p>Add a category before creating the first inventory item.</p>
+            {% else %}
+                <p>A manager must add a category before items can be organized.</p>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

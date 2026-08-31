@@ -36,6 +36,32 @@ class InventoryMovementForm(forms.Form):
     )
 
 
+class CategoryCatalogForm(forms.Form):
+    name = forms.CharField(
+        label="Category name",
+        max_length=100,
+    )
+
+
+class ItemCatalogForm(forms.Form):
+    name = forms.CharField(
+        label="Item name",
+        max_length=150,
+    )
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.order_by("name"),
+        empty_label="Select a category",
+    )
+    reorder_level = forms.IntegerField(
+        label="Reorder level",
+        min_value=0,
+        initial=0,
+        widget=forms.NumberInput(
+            attrs={"min": 0, "inputmode": "numeric"}
+        ),
+    )
+
+
 class ItemSearchForm(forms.Form):
     query = forms.CharField(
         label="Item name",

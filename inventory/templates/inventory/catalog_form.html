@@ -1,0 +1,43 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}{{ page_title }}{% endblock %}
+
+{% block content %}
+<header class="page-heading">
+    <div>
+        <h1>{{ page_title }}</h1>
+        <p>{{ page_description }}</p>
+    </div>
+</header>
+
+<section class="catalog-sheet" aria-labelledby="catalog-details-title">
+    <div class="catalog-sheet-heading">
+        <div>
+            <h2 id="catalog-details-title">{{ sheet_title }}</h2>
+        </div>
+        <span>{{ sheet_note }}</span>
+    </div>
+
+    <form method="post" class="catalog-form">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="catalog-form-fields">
+            {% for field in form %}
+                <div class="form-field">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <p class="catalog-guidance">{{ guidance }}</p>
+
+        <div class="catalog-actions">
+            <button class="button button-primary" type="submit">{{ submit_label }}</button>
+            <a class="button button-quiet" href="{{ cancel_url }}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

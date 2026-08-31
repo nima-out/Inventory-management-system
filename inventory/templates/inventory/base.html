@@ -26,10 +26,17 @@
                             {% if request.resolver_match.view_name == 'inventory:dashboard' %}aria-current="page"{% endif %}
                         >Overview</a>
                         <a
-                            class="nav-link{% if request.resolver_match.view_name == 'inventory:item-list' %} is-active{% endif %}"
+                            class="nav-link{% if request.resolver_match.view_name == 'inventory:item-list' or request.resolver_match.view_name == 'inventory:item-create' or request.resolver_match.view_name == 'inventory:item-update' or request.resolver_match.view_name == 'inventory:item-archive' or request.resolver_match.view_name == 'inventory:item-reactivate' %} is-active{% endif %}"
                             href="{% url 'inventory:item-list' %}"
-                            {% if request.resolver_match.view_name == 'inventory:item-list' %}aria-current="page"{% endif %}
+                            {% if request.resolver_match.view_name == 'inventory:item-list' or request.resolver_match.view_name == 'inventory:item-create' or request.resolver_match.view_name == 'inventory:item-update' or request.resolver_match.view_name == 'inventory:item-archive' or request.resolver_match.view_name == 'inventory:item-reactivate' %}aria-current="page"{% endif %}
                         >Items</a>
+                    {% endif %}
+                    {% if perms.inventory.view_category %}
+                        <a
+                            class="nav-link{% if request.resolver_match.view_name == 'inventory:category-list' or request.resolver_match.view_name == 'inventory:category-create' or request.resolver_match.view_name == 'inventory:category-update' or request.resolver_match.view_name == 'inventory:category-delete' %} is-active{% endif %}"
+                            href="{% url 'inventory:category-list' %}"
+                            {% if request.resolver_match.view_name == 'inventory:category-list' or request.resolver_match.view_name == 'inventory:category-create' or request.resolver_match.view_name == 'inventory:category-update' or request.resolver_match.view_name == 'inventory:category-delete' %}aria-current="page"{% endif %}
+                        >Categories</a>
                     {% endif %}
                     {% if perms.inventory.record_inventory_movement %}
                         <a

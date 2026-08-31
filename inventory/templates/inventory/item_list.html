@@ -8,6 +8,11 @@
         <h1>Items</h1>
         <p>Search the catalog and review current stock.</p>
     </div>
+    {% if perms.inventory.add_item %}
+        <div class="page-actions">
+            <a class="button button-primary" href="{% url 'inventory:item-create' %}">Add item</a>
+        </div>
+    {% endif %}
 </header>
 
 <section class="workspace-panel" aria-labelledby="inventory-results-title">
@@ -55,7 +60,7 @@
                         <th scope="col" class="number-cell">Reorder at</th>
                         <th scope="col">Stock status</th>
                         <th scope="col">Catalog state</th>
-                        {% if perms.inventory.record_inventory_movement %}
+                        {% if perms.inventory.record_inventory_movement or perms.inventory.change_item or perms.inventory.archive_item or perms.inventory.reactivate_item %}
                             <th scope="col" class="table-action">
                                 <span class="visually-hidden">Actions</span>
                             </th>
@@ -100,12 +105,37 @@
                                     </span>
                                 {% endif %}
                             </td>
-                            {% if perms.inventory.record_inventory_movement %}
+                            {% if perms.inventory.record_inventory_movement or perms.inventory.change_item or perms.inventory.archive_item or perms.inventory.reactivate_item %}
                                 <td class="table-action">
                                     {% if item.is_active %}
-                                        <a class="row-action" href="{% url 'inventory:record-movement' %}?item={{ item.pk }}">Move stock</a>
+                                        {% if perms.inventory.change_item or perms.inventory.record_inventory_movement or perms.inventory.archive_item %}
+                                            <div class="row-actions">
+                                                {% if perms.inventory.change_item %}
+                                                    <a class="row-action" href="{% url 'inventory:item-update' item_id=item.pk %}">Edit</a>
+                                                {% endif %}
+                                                {% if perms.inventory.record_inventory_movement %}
+                                                    <a class="row-action" href="{% url 'inventory:record-movement' %}?item={{ item.pk }}">Move stock</a>
+                                                {% endif %}
+                                                {% if perms.inventory.archive_item %}
+                                                    <a class="row-action row-action-danger" href="{% url 'inventory:item-archive' item_id=item.pk %}">Archive</a>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="table-action-empty" aria-label="No action available">—</span>
+                                        {% endif %}
                                     {% else %}
-                                        <span class="table-action-empty" aria-label="No action available">—</span>
+                                        {% if perms.inventory.change_item or perms.inventory.reactivate_item %}
+                                            <div class="row-actions">
+                                                {% if perms.inventory.change_item %}
+                                                    <a class="row-action" href="{% url 'inventory:item-update' item_id=item.pk %}">Edit</a>
+                                                {% endif %}
+                                                {% if perms.inventory.reactivate_item %}
+                                                    <a class="row-action" href="{% url 'inventory:item-reactivate' item_id=item.pk %}">Reactivate</a>
+                                                {% endif %}
+                                            </div>
+                                        {% else %}
+                                            <span class="table-action-empty" aria-label="No action available">—</span>
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                             {% endif %}

@@ -9,7 +9,7 @@ from .exceptions import (
     InvalidStockStatusError,
     InvalidTransactionTypeError,
 )
-from .models import Item, TransactionHistory
+from .models import Category, Item, TransactionHistory
 
 
 STOCK_STATUS_LOW = "low"
@@ -57,6 +57,13 @@ def get_inventory_summary():
             filter=Q(quantity=0),
         ),
     )
+
+
+def list_categories():
+    """Return categories with the number of items assigned to each."""
+    return Category.objects.annotate(
+        item_count=Count("items"),
+    ).order_by("name")
 
 
 def list_low_stock_items():

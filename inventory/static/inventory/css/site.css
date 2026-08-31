@@ -261,6 +261,12 @@ h3 {
     font-size: 0.88rem;
 }
 
+.page-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
 .visually-hidden {
     position: absolute;
     width: 1px;
@@ -300,6 +306,17 @@ h3 {
 .button-primary:hover {
     border-color: var(--cobalt-dark);
     background: var(--cobalt-dark);
+}
+
+.button-danger {
+    color: #fff;
+    border-color: var(--out);
+    background: var(--out);
+}
+
+.button-danger:hover {
+    border-color: #8f1c14;
+    background: #8f1c14;
 }
 
 .button-secondary {
@@ -561,6 +578,123 @@ h3 {
     gap: 0.4rem;
 }
 
+.catalog-sheet,
+.confirmation-sheet {
+    width: min(100%, 680px);
+    border: 1px solid var(--hairline);
+    border-top: 2px solid var(--cobalt);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow: hidden;
+}
+
+.confirmation-sheet-danger {
+    border-top-color: var(--out);
+}
+
+.catalog-sheet-heading,
+.confirmation-sheet-heading {
+    display: flex;
+    min-height: 72px;
+    padding: 1rem 1.2rem;
+    border-bottom: 1px solid var(--hairline);
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.catalog-sheet-heading h2,
+.confirmation-sheet-heading h2 {
+    margin-bottom: 0;
+}
+
+.catalog-sheet-heading > span,
+.confirmation-sheet-heading > span {
+    color: var(--slate);
+    font-family: var(--data-font);
+    font-size: 0.68rem;
+    white-space: nowrap;
+}
+
+.catalog-form {
+    display: grid;
+    padding: 1.2rem;
+    gap: 1rem;
+}
+
+.catalog-form-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem 0.8rem;
+}
+
+.catalog-form-fields .form-field:first-child {
+    grid-column: 1 / -1;
+}
+
+.catalog-guidance,
+.confirmation-warning {
+    margin: 0;
+    padding: 0.7rem 0.8rem;
+    border-left: 2px solid var(--hairline-strong);
+    color: var(--slate);
+    background: var(--surface-subtle);
+    font-size: 0.78rem;
+}
+
+.confirmation-sheet-danger .confirmation-warning {
+    border-left-color: var(--out);
+}
+
+.catalog-actions {
+    display: flex;
+    padding-top: 0.2rem;
+    gap: 0.4rem;
+}
+
+.confirmation-body {
+    display: grid;
+    padding: 1.2rem;
+    gap: 1rem;
+}
+
+.confirmation-facts {
+    display: grid;
+    margin: 0;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    overflow: hidden;
+}
+
+.confirmation-facts > div {
+    min-width: 0;
+    padding: 0.8rem;
+    border-left: 1px solid var(--hairline);
+}
+
+.confirmation-facts > div:first-child {
+    border-left: 0;
+}
+
+.confirmation-facts dt {
+    color: var(--slate);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.045em;
+    text-transform: uppercase;
+}
+
+.confirmation-facts dd {
+    margin: 0.3rem 0 0;
+    overflow: hidden;
+    color: var(--graphite);
+    font-family: var(--data-font);
+    font-size: 0.8rem;
+    font-weight: 620;
+    text-overflow: ellipsis;
+}
+
 .table-wrap {
     width: 100%;
     overflow: auto;
@@ -623,6 +757,18 @@ tbody tr:hover {
 
 .row-action {
     font-size: 0.78rem;
+}
+
+.row-actions {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.7rem;
+    white-space: nowrap;
+}
+
+.row-action-danger {
+    color: var(--out);
 }
 
 .table-action-empty {
@@ -917,7 +1063,9 @@ tbody tr:hover {
 
     .page-heading,
     .panel-heading,
-    .movement-sheet-heading {
+    .movement-sheet-heading,
+    .catalog-sheet-heading,
+    .confirmation-sheet-heading {
         align-items: flex-start;
         flex-direction: column;
     }
@@ -947,7 +1095,23 @@ tbody tr:hover {
         grid-template-columns: 1fr;
     }
 
-    .movement-actions .button {
+    .catalog-form-fields,
+    .confirmation-facts {
+        grid-template-columns: 1fr;
+    }
+
+    .confirmation-facts > div,
+    .confirmation-facts > div:first-child {
+        border-top: 1px solid var(--hairline);
+        border-left: 0;
+    }
+
+    .confirmation-facts > div:first-child {
+        border-top: 0;
+    }
+
+    .movement-actions .button,
+    .catalog-actions .button {
         flex: 1;
     }
 
