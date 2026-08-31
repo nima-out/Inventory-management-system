@@ -12,9 +12,7 @@ from inventory.services import (
 
 
 class Command(BaseCommand):
-    help = (
-        "Idempotently create the demo guitar-store catalog and initial stock."
-    )
+    help = "Idempotently create the guitar-store catalog and initial stock."
 
     required_permissions = (
         "inventory.add_category",
@@ -26,9 +24,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--username",
             required=True,
-            help=(
-                "Existing active user who will own initial stock movements."
-            ),
+            help="Active user who will own initial stock movements.",
         )
 
     def handle(self, *args, **options):
@@ -41,7 +37,6 @@ class Command(BaseCommand):
             raise CommandError(
                 f"User does not exist: {options['username']}"
             ) from error
-
         if not actor.is_active:
             raise CommandError("The seed user must be active.")
 
@@ -63,7 +58,6 @@ class Command(BaseCommand):
             "items_existing": 0,
             "movements_created": 0,
         }
-
         with transaction.atomic():
             for category_name, item_specs in GUITAR_STORE_CATALOG.items():
                 category = Category.objects.filter(
@@ -94,7 +88,6 @@ class Command(BaseCommand):
                         reorder_level=reorder_level,
                     )
                     summary["items_created"] += 1
-
                     if initial_quantity > 0:
                         record_inventory_movement(
                             item_id=item.pk,

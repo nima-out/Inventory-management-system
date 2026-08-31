@@ -34,6 +34,14 @@ class CategoryModelTests(TestCase):
             with transaction.atomic():
                 Category.objects.create(name="Electronics")
 
+    def test_name_is_unique_regardless_of_case(self):
+        Category.objects.create(name="Electronics")
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Category.objects.create(name="electronics")
+
+
 class ItemModelTests(TestCase):
     def setUp(self):
         self.category = Category.objects.create(name="Electronics")
@@ -76,6 +84,67 @@ class ItemModelTests(TestCase):
         )
 
         self.assertIsNotNone(second_item.pk)
+
+    def test_item_name_is_unique_regardless_of_case(self):
+        Item.objects.create(name="Laptop", category=self.category)
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                Item.objects.create(
+                    name="laptop",
+                    category=self.category,
+                )
+
+    def test_item_cannot_start_with_nonzero_quantity(self):
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Item quantity can only be changed through the inventory "
+            "movement service.",
+        ):
+            Item.objects.create(
+                name="Laptop",
+                category=self.category,
+                quantity=1,
+            )
+
+    def test_saved_quantity_cannot_be_changed_directly(self):
+        item = Item.objects.create(
+            name="Laptop",
+            category=self.category,
+        )
+        item.quantity = 1
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Item quantity can only be changed through the inventory "
+            "movement service.",
+        ):
+            item.save()
+
+    def test_queryset_quantity_update_is_rejected(self):
+        item = Item.objects.create(
+            name="Laptop",
+            category=self.category,
+        )
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Item quantity can only be changed through the inventory "
+            "movement service.",
+        ):
+            Item.objects.filter(pk=item.pk).update(quantity=1)
+
+    def test_items_must_be_archived_instead_of_deleted(self):
+        item = Item.objects.create(
+            name="Laptop",
+            category=self.category,
+        )
+
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Items must be archived instead of deleted.",
+        ):
+            item.delete()
 
     def test_quantity_cannot_be_negative(self):
         item = Item(
@@ -136,7 +205,6 @@ class TransactionHistoryModelTests(TestCase):
         self.item = Item.objects.create(
             category=self.category,
             name="Laptop",
-            quantity=10,
             reorder_level=2,
         )
 
@@ -262,10 +330,13 @@ class TransactionHistoryModelTests(TestCase):
             ).exists()
         )
 
-    def test_referenced_item_cannot_be_deleted(self):
+    def test_item_with_history_must_be_archived(self):
         self.create_transaction()
 
-        with self.assertRaises(ProtectedError):
+        with self.assertRaisesMessage(
+            ValidationError,
+            "Items must be archived instead of deleted.",
+        ):
             self.item.delete()
 
     def test_referenced_user_cannot_be_deleted(self):

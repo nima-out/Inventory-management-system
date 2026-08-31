@@ -39,12 +39,10 @@ def get_default_backup_directory():
 def require_external_backup_directory(output_directory):
     base_dir = Path(settings.BASE_DIR).resolve()
     output_directory = Path(output_directory).expanduser().resolve()
-
     if output_directory == base_dir or base_dir in output_directory.parents:
         raise SQLiteWorkflowError(
             "The backup directory must be outside the repository."
         )
-
     return output_directory
 
 
@@ -71,7 +69,6 @@ def inspect_database(database_path):
         "items": Item._meta.db_table,
         "transactions": TransactionHistory._meta.db_table,
     }
-
     try:
         with closing(_connect_read_only(database_path)) as database:
             integrity = database.execute(
@@ -92,7 +89,6 @@ def inspect_database(database_path):
         raise SQLiteWorkflowError(
             f"Could not inspect SQLite database: {error}"
         ) from error
-
     return counts
 
 
@@ -110,6 +106,7 @@ def create_dated_backup(database_path, output_directory, prefix="inventory"):
         raise SQLiteWorkflowError(
             f"Could not create backup directory: {error}"
         ) from error
+
     timestamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
     backup_path = output_directory / f"{prefix}-{timestamp}.sqlite3"
     counter = 1
@@ -158,7 +155,6 @@ def restore_database(backup_path, database_path):
         raise SQLiteWorkflowError(
             "The restored database row counts do not match the backup."
         )
-
     return restored_counts
 
 
@@ -170,7 +166,6 @@ def _copy_database(source_path, destination_path):
     )
     os.close(file_descriptor)
     temporary_path = Path(temporary_name)
-
     try:
         with (
             closing(_connect_read_only(source_path)) as source,
@@ -185,7 +180,6 @@ def _copy_database(source_path, destination_path):
                 raise SQLiteWorkflowError(
                     f"SQLite integrity check failed: {integrity}"
                 )
-
         os.replace(temporary_path, destination_path)
     except (OSError, sqlite3.Error) as error:
         raise SQLiteWorkflowError(

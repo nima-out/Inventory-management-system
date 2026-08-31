@@ -16,24 +16,11 @@ from inventory.sqlite_tools import (
 
 
 class Command(BaseCommand):
-    help = (
-        "Validate and restore a SQLite backup after making a safety backup."
-    )
+    help = "Validate and restore SQLite after making a safety backup."
 
     def add_arguments(self, parser):
-        parser.add_argument(
-            "backup_path",
-            type=Path,
-            help="Path to the SQLite backup to restore.",
-        )
-        parser.add_argument(
-            "--backup-dir",
-            type=Path,
-            help=(
-                "Directory for the pre-restore safety backup. Defaults to a "
-                "sibling directory named <project>-backups."
-            ),
-        )
+        parser.add_argument("backup_path", type=Path)
+        parser.add_argument("--backup-dir", type=Path)
         parser.add_argument(
             "--yes",
             action="store_true",
@@ -43,12 +30,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         if not options["yes"]:
             raise CommandError(
-                "Restore cancelled. Re-run with --yes after stopping every "
-                "process that uses the database."
+                "Restore cancelled. Stop every database process and re-run "
+                "with --yes."
             )
 
         backup_path = options["backup_path"].expanduser().resolve()
-
         try:
             database_path = get_database_path()
             safety_directory = require_external_backup_directory(
@@ -57,23 +43,19 @@ class Command(BaseCommand):
             inspect_database(backup_path)
             backup_sidecars = get_sqlite_sidecars(backup_path)
             if backup_sidecars:
-                sidecar_names = ", ".join(
-                    path.name for path in backup_sidecars
-                )
+                names = ", ".join(path.name for path in backup_sidecars)
                 raise SQLiteWorkflowError(
                     "The selected backup has SQLite sidecar files "
-                    f"({sidecar_names}) and may be an active database."
+                    f"({names}) and may be active."
                 )
 
             connections.close_all()
-
-            sidecars = get_sqlite_sidecars(database_path)
-            if sidecars:
-                sidecar_names = ", ".join(path.name for path in sidecars)
+            live_sidecars = get_sqlite_sidecars(database_path)
+            if live_sidecars:
+                names = ", ".join(path.name for path in live_sidecars)
                 raise SQLiteWorkflowError(
-                    "SQLite sidecar files are present "
-                    f"({sidecar_names}). Stop every database process and "
-                    "resolve the journal/WAL files before restoring."
+                    "The live database has SQLite sidecar files "
+                    f"({names}). Stop all database processes first."
                 )
 
             if database_path.exists():
@@ -84,11 +66,7 @@ class Command(BaseCommand):
                 )
             else:
                 safety_path = None
-
-            restored_counts = restore_database(
-                backup_path,
-                database_path,
-            )
+            restored_counts = restore_database(backup_path, database_path)
         except SQLiteWorkflowError as error:
             raise CommandError(str(error)) from error
 

@@ -18,10 +18,7 @@ class Command(BaseCommand):
         parser.add_argument(
             "--output-dir",
             type=Path,
-            help=(
-                "External backup directory. Defaults to a sibling directory "
-                "named <project>-backups."
-            ),
+            help="External backup directory; defaults beside the project.",
         )
 
     def handle(self, *args, **options):
