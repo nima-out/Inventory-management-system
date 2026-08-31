@@ -4,6 +4,24 @@ Stockroom is a local Django inventory application for a single-user guitar
 store. It manages categories, items, stock movements, low-stock warnings, and
 immutable transaction history using SQLite.
 
+## Project structure
+
+```text
+inventory/
+├── database/          # SQLite backup and restore support
+├── management/
+│   ├── commands/      # Django management command entry points
+│   └── data/          # Static datasets used by commands
+├── migrations/        # Django database migrations
+├── static/            # App-owned CSS and other static assets
+├── templates/         # App templates
+├── tests/             # Tests grouped by application concern
+├── models.py          # Persistent domain models
+├── selectors.py       # Read/query operations
+├── services.py        # Write/business operations
+└── views.py           # HTTP request handling
+```
+
 ## Reproducible local setup
 
 The supported development environment is Python 3.13.13 with the versions in

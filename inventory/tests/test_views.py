@@ -3,8 +3,8 @@ from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Category, Item, TransactionHistory
-from .services import record_inventory_movement
+from ..models import Category, Item, TransactionHistory
+from ..services import record_inventory_movement
 
 
 class InventoryViewTests(TestCase):

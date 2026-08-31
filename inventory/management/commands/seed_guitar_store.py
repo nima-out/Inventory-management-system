@@ -3,7 +3,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
 from inventory.models import Category, Item, TransactionHistory
-from inventory.seed_data import GUITAR_STORE_CATALOG
+from inventory.management.data.guitar_store import GUITAR_STORE_CATALOG
 from inventory.services import (
     create_category,
     create_item,

@@ -3,7 +3,7 @@ from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connections
 
-from inventory.sqlite_tools import (
+from inventory.database.sqlite import (
     SQLiteWorkflowError,
     create_dated_backup,
     get_database_path,

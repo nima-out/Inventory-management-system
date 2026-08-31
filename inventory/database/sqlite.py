@@ -8,7 +8,7 @@ from pathlib import Path
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
-from .models import Category, Item, TransactionHistory
+from ..models import Category, Item, TransactionHistory
 
 
 class SQLiteWorkflowError(Exception):

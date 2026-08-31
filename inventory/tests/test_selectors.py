@@ -4,13 +4,13 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.utils import timezone
 
-from .exceptions import (
+from ..exceptions import (
     InvalidDateRangeError,
     InvalidStockStatusError,
     InvalidTransactionTypeError,
 )
-from .models import Category, Item, TransactionHistory
-from .selectors import (
+from ..models import Category, Item, TransactionHistory
+from ..selectors import (
     STOCK_STATUS_HEALTHY,
     STOCK_STATUS_LOW,
     STOCK_STATUS_OUT,
@@ -20,7 +20,7 @@ from .selectors import (
     list_transaction_history,
     search_items,
 )
-from .services import archive_item, record_inventory_movement
+from ..services import archive_item, record_inventory_movement
 
 
 class InventorySelectorTests(TestCase):

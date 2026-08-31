@@ -11,7 +11,7 @@ from django.core.management.base import CommandError
 from django.db.models import Sum
 from django.test import SimpleTestCase, TestCase
 
-from .models import Category, Item, TransactionHistory
+from ..models import Category, Item, TransactionHistory
 
 
 class SQLiteRecoveryCommandTests(SimpleTestCase):

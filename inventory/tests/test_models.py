@@ -4,7 +4,7 @@ from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 
-from .models import Category, Item, TransactionHistory
+from ..models import Category, Item, TransactionHistory
 
 
 class CategoryModelTests(TestCase):

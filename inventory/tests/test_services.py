@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.auth.models import AnonymousUser
 from django.test import TestCase
 
-from .exceptions import (
+from ..exceptions import (
     CategoryInUseError,
     DuplicateCategoryNameError,
     InactiveItemError,
@@ -16,8 +16,8 @@ from .exceptions import (
     InventoryItemNotFoundError,
     InventoryPermissionDeniedError,
 )
-from .models import Category, Item, TransactionHistory
-from .services import (
+from ..models import Category, Item, TransactionHistory
+from ..services import (
     archive_item,
     create_category,
     create_item,

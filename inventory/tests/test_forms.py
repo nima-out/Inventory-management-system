@@ -1,11 +1,11 @@
 from django.test import TestCase
 
-from .forms import (
+from ..forms import (
     InventoryMovementForm,
     ItemCatalogForm,
     TransactionHistoryFilterForm,
 )
-from .models import Category, Item, TransactionHistory
+from ..models import Category, Item, TransactionHistory
 
 
 class InventoryFormTests(TestCase):

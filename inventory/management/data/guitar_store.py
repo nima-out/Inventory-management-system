@@ -1,3 +1,5 @@
+"""Demo catalog used by the guitar-store seeding command."""
+
 GUITAR_STORE_CATALOG = {
     "6-string guitars": [
         ("ibanez axion label 7-string", 0, 15),
