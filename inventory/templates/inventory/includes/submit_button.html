@@ -1,0 +1,13 @@
+<button
+    class="btn {{ button_class|default:'button-primary' }}"
+    type="submit"
+    data-submit-button
+    data-busy-label="{{ busy_label }}"
+>
+    <span data-submit-label>{{ label }}</span>
+    <span
+        class="spinner-border spinner-border-sm d-none"
+        data-submit-spinner
+        aria-hidden="true"
+    ></span>
+</button>

@@ -113,6 +113,7 @@ def category_create(request):
         "sheet_note": "New category",
         "guidance": "Category names are unique regardless of capitalization.",
         "submit_label": "Add category",
+        "busy_label": "Adding category…",
         "cancel_url": reverse("inventory:category-list"),
     }
     return render(request, "inventory/catalog_form.html", context)
@@ -159,6 +160,7 @@ def category_update(request, category_id):
         "sheet_note": "Existing category",
         "guidance": "The new name must remain unique regardless of capitalization.",
         "submit_label": "Save changes",
+        "busy_label": "Saving changes…",
         "cancel_url": reverse("inventory:category-list"),
     }
     return render(request, "inventory/catalog_form.html", context)
@@ -183,6 +185,7 @@ def category_delete(request, category_id):
             "inactive items. This action cannot be undone."
         ),
         "submit_label": "Delete category",
+        "busy_label": "Deleting category…",
         "cancel_url": reverse("inventory:category-list"),
         "destructive": True,
     }
@@ -279,6 +282,7 @@ def item_create(request):
             "initial quantity."
         ),
         "submit_label": "Add item",
+        "busy_label": "Adding item…",
         "cancel_url": reverse("inventory:item-list"),
     }
     return render(request, "inventory/catalog_form.html", context)
@@ -341,6 +345,7 @@ def item_update(request, item_id):
             "be edited here."
         ),
         "submit_label": "Save changes",
+        "busy_label": "Saving changes…",
         "cancel_url": reverse("inventory:item-list"),
     }
     return render(request, "inventory/catalog_form.html", context)
@@ -369,6 +374,7 @@ def item_archive(request, item_id):
             "history, but prevents further stock movements until reactivation."
         ),
         "submit_label": "Archive item",
+        "busy_label": "Archiving item…",
         "cancel_url": reverse("inventory:item-list"),
         "destructive": True,
     }
@@ -414,6 +420,7 @@ def item_reactivate(request, item_id):
             "includes it in active inventory totals."
         ),
         "submit_label": "Reactivate item",
+        "busy_label": "Reactivating item…",
         "cancel_url": f"{reverse('inventory:item-list')}?include_inactive=on",
         "destructive": False,
     }

@@ -5,6 +5,7 @@
 {% block content %}
 <header class="page-heading">
     <div>
+        <span class="heading-kicker">Catalog maintenance</span>
         <h1>{{ page_title }}</h1>
         <p>{{ page_description }}</p>
     </div>
@@ -18,25 +19,26 @@
         <span>{{ sheet_note }}</span>
     </div>
 
-    <form method="post" class="catalog-form">
+    <form
+        method="post"
+        class="catalog-form"
+        data-submit-form
+        data-dirty-guard
+    >
         {% csrf_token %}
-        {{ form.non_field_errors }}
+        {% include "inventory/includes/form_errors.html" %}
 
         <div class="catalog-form-fields">
             {% for field in form %}
-                <div class="form-field">
-                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {{ field }}
-                    {{ field.errors }}
-                </div>
+                {% include "inventory/includes/form_field.html" with field=field %}
             {% endfor %}
         </div>
 
         <p class="catalog-guidance">{{ guidance }}</p>
 
         <div class="catalog-actions">
-            <button class="button button-primary" type="submit">{{ submit_label }}</button>
-            <a class="button button-quiet" href="{{ cancel_url }}">Cancel</a>
+            {% include "inventory/includes/submit_button.html" with label=submit_label busy_label=busy_label button_class="button-primary" %}
+            <a class="btn button-quiet" href="{{ cancel_url }}" data-cancel-form>Cancel</a>
         </div>
     </form>
 </section>

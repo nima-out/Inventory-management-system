@@ -1,0 +1,17 @@
+{% with field_errors=field.errors %}
+    <div class="form-field{% if field_errors %} has-errors{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ label|default:field.label }}</label>
+        {{ field }}
+        <div class="field-feedback" id="{{ field.id_for_label }}-feedback">
+            {% if field_errors %}
+                <ul class="errorlist">
+                    {% for error in field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% elif field.help_text %}
+                <span class="field-help">{{ field.help_text }}</span>
+            {% endif %}
+        </div>
+    </div>
+{% endwith %}

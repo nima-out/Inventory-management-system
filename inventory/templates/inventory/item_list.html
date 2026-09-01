@@ -5,41 +5,62 @@
 {% block content %}
 <header class="page-heading">
     <div>
+        <span class="heading-kicker">Catalog register</span>
         <h1>Items</h1>
         <p>Search the catalog and review current stock.</p>
     </div>
     {% if perms.inventory.add_item %}
         <div class="page-actions">
-            <a class="button button-primary" href="{% url 'inventory:item-create' %}">Add item</a>
+            <a class="btn button-primary" href="{% url 'inventory:item-create' %}">Add item</a>
         </div>
     {% endif %}
 </header>
 
 <section class="workspace-panel" aria-labelledby="inventory-results-title">
-    <form method="get" class="filter-bar" aria-label="Inventory filters">
+    <div class="filter-toolbar d-lg-none">
+        <button
+            class="btn filter-toggle"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#item-filters"
+            aria-controls="item-filters"
+            aria-expanded="{% if request.GET or form.errors %}true{% else %}false{% endif %}"
+        >
+            <span>Filters</span>
+            <span class="filter-toggle-mark" aria-hidden="true"></span>
+        </button>
+    </div>
+    <form
+        method="get"
+        class="filter-bar filter-panel d-lg-block"
+        id="item-filters"
+        aria-label="Inventory filters"
+        data-filter-panel
+        data-expanded="{% if request.GET or form.errors %}true{% else %}false{% endif %}"
+    >
+        {% include "inventory/includes/form_errors.html" %}
         <div class="filter-grid filter-grid-items">
-            <div class="form-field">
-                <label for="{{ form.query.id_for_label }}">{{ form.query.label }}</label>
-                {{ form.query }}
-                {{ form.query.errors }}
-            </div>
-            <div class="form-field">
-                <label for="{{ form.category.id_for_label }}">Category</label>
-                {{ form.category }}
-                {{ form.category.errors }}
-            </div>
-            <div class="form-field">
-                <label for="{{ form.stock_status.id_for_label }}">Stock status</label>
-                {{ form.stock_status }}
-                {{ form.stock_status.errors }}
-            </div>
-            <label class="check-field" for="{{ form.include_inactive.id_for_label }}">
-                {{ form.include_inactive }}
-                <span>Include inactive</span>
-            </label>
+            {% include "inventory/includes/form_field.html" with field=form.query %}
+            {% include "inventory/includes/form_field.html" with field=form.category label="Category" %}
+            {% include "inventory/includes/form_field.html" with field=form.stock_status label="Stock status" %}
+            {% with field_errors=form.include_inactive.errors %}
+                <div class="check-field-wrap{% if field_errors %} has-errors{% endif %}">
+                    <label class="check-field" for="{{ form.include_inactive.id_for_label }}">
+                        {{ form.include_inactive }}
+                        <span>Include inactive</span>
+                    </label>
+                    <div class="field-feedback" id="{{ form.include_inactive.id_for_label }}-feedback">
+                        {% if field_errors %}
+                            <ul class="errorlist">
+                                {% for error in field_errors %}<li>{{ error }}</li>{% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endwith %}
             <div class="filter-actions">
-                <button class="button button-primary" type="submit">Apply</button>
-                <a class="button button-quiet" href="{% url 'inventory:item-list' %}">Clear</a>
+                <button class="btn button-primary" type="submit">Apply filters</button>
+                <a class="btn button-quiet" href="{% url 'inventory:item-list' %}">Clear</a>
             </div>
         </div>
     </form>
@@ -50,8 +71,8 @@
     </div>
 
     {% if page_obj.object_list %}
-        <div class="table-wrap">
-            <table>
+        <div class="table-responsive table-wrap">
+            <table class="table inventory-table mb-0">
                 <thead>
                     <tr>
                         <th scope="col">Item</th>
@@ -76,33 +97,18 @@
                             <td class="number-cell data-value">{{ item.reorder_level }}</td>
                             <td>
                                 {% if item.quantity == 0 %}
-                                    <span class="status status-out">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        Out of stock
-                                    </span>
+                                    {% include "inventory/includes/status.html" with tone="out" label="Out of stock" %}
                                 {% elif item.is_low_stock %}
-                                    <span class="status status-low">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        Low stock
-                                    </span>
+                                    {% include "inventory/includes/status.html" with tone="low" label="Low stock" %}
                                 {% else %}
-                                    <span class="status status-healthy">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        Healthy
-                                    </span>
+                                    {% include "inventory/includes/status.html" with tone="healthy" label="Healthy" %}
                                 {% endif %}
                             </td>
                             <td>
                                 {% if item.is_active %}
-                                    <span class="status status-active">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        Active
-                                    </span>
+                                    {% include "inventory/includes/status.html" with tone="active" label="Active" %}
                                 {% else %}
-                                    <span class="status status-inactive">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        Inactive
-                                    </span>
+                                    {% include "inventory/includes/status.html" with tone="inactive" label="Inactive" %}
                                 {% endif %}
                             </td>
                             {% if perms.inventory.record_inventory_movement or perms.inventory.change_item or perms.inventory.archive_item or perms.inventory.reactivate_item %}

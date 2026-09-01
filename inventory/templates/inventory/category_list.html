@@ -5,12 +5,13 @@
 {% block content %}
 <header class="page-heading">
     <div>
+        <span class="heading-kicker">Catalog structure</span>
         <h1>Categories</h1>
         <p>Review the groups used to organize inventory.</p>
     </div>
     {% if perms.inventory.add_category %}
         <div class="page-actions">
-            <a class="button button-primary" href="{% url 'inventory:category-create' %}">Add category</a>
+            <a class="btn button-primary" href="{% url 'inventory:category-create' %}">Add category</a>
         </div>
     {% endif %}
 </header>
@@ -22,8 +23,8 @@
     </div>
 
     {% if categories %}
-        <div class="table-wrap">
-            <table>
+        <div class="table-responsive table-wrap">
+            <table class="table inventory-table mb-0">
                 <thead>
                     <tr>
                         <th scope="col">Category</th>

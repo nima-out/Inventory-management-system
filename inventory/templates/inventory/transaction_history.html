@@ -5,43 +5,44 @@
 {% block content %}
 <header class="page-heading">
     <div>
+        <span class="heading-kicker">Permanent ledger</span>
         <h1>Movement history</h1>
         <p>Inventory changes, newest first.</p>
     </div>
 </header>
 
 <section class="workspace-panel" aria-labelledby="history-results-title">
-    <form method="get" class="filter-bar" aria-label="Transaction history filters">
-        {{ form.non_field_errors }}
+    <div class="filter-toolbar d-lg-none">
+        <button
+            class="btn filter-toggle"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#history-filters"
+            aria-controls="history-filters"
+            aria-expanded="{% if request.GET or form.errors %}true{% else %}false{% endif %}"
+        >
+            <span>Filters</span>
+            <span class="filter-toggle-mark" aria-hidden="true"></span>
+        </button>
+    </div>
+    <form
+        method="get"
+        class="filter-bar filter-panel d-lg-block"
+        id="history-filters"
+        aria-label="Transaction history filters"
+        data-filter-panel
+        data-expanded="{% if request.GET or form.errors %}true{% else %}false{% endif %}"
+    >
+        {% include "inventory/includes/form_errors.html" %}
         <div class="filter-grid filter-grid-history">
-            <div class="form-field">
-                <label for="{{ form.item.id_for_label }}">Item</label>
-                {{ form.item }}
-                {{ form.item.errors }}
-            </div>
-            <div class="form-field">
-                <label for="{{ form.user.id_for_label }}">User</label>
-                {{ form.user }}
-                {{ form.user.errors }}
-            </div>
-            <div class="form-field">
-                <label for="{{ form.transaction_type.id_for_label }}">Type</label>
-                {{ form.transaction_type }}
-                {{ form.transaction_type.errors }}
-            </div>
-            <div class="form-field">
-                <label for="{{ form.start.id_for_label }}">{{ form.start.label }}</label>
-                {{ form.start }}
-                {{ form.start.errors }}
-            </div>
-            <div class="form-field">
-                <label for="{{ form.end.id_for_label }}">{{ form.end.label }}</label>
-                {{ form.end }}
-                {{ form.end.errors }}
-            </div>
+            {% include "inventory/includes/form_field.html" with field=form.item label="Item" %}
+            {% include "inventory/includes/form_field.html" with field=form.user label="User" %}
+            {% include "inventory/includes/form_field.html" with field=form.transaction_type label="Type" %}
+            {% include "inventory/includes/form_field.html" with field=form.start %}
+            {% include "inventory/includes/form_field.html" with field=form.end %}
             <div class="filter-actions">
-                <button class="button button-primary" type="submit">Apply</button>
-                <a class="button button-quiet" href="{% url 'inventory:transaction-history' %}">Clear</a>
+                <button class="btn button-primary" type="submit">Apply filters</button>
+                <a class="btn button-quiet" href="{% url 'inventory:transaction-history' %}">Clear</a>
             </div>
         </div>
     </form>
@@ -52,8 +53,8 @@
     </div>
 
     {% if page_obj.object_list %}
-        <div class="table-wrap">
-            <table>
+        <div class="table-responsive table-wrap">
+            <table class="table inventory-table mb-0">
                 <thead>
                     <tr>
                         <th scope="col">Date and time</th>
@@ -67,21 +68,19 @@
                 <tbody>
                     {% for transaction in page_obj %}
                         <tr>
-                            <td class="nowrap data-value">{{ transaction.timestamp|date:"Y-m-d H:i" }}</td>
+                            <td class="nowrap data-value">
+                                <time datetime="{{ transaction.timestamp|date:'c' }}">
+                                    {{ transaction.timestamp|date:"DATETIME_FORMAT" }}
+                                </time>
+                            </td>
                             <td class="item-name">{{ transaction.item.name }}</td>
                             <td>{{ transaction.item.category.name }}</td>
                             <td>{{ transaction.user.get_username }}</td>
                             <td>
                                 {% if transaction.transaction_type == "IN" %}
-                                    <span class="status status-in">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        Stock in
-                                    </span>
+                                    {% include "inventory/includes/status.html" with tone="in" label="Stock in" %}
                                 {% else %}
-                                    <span class="status status-out">
-                                        <span class="status-dot" aria-hidden="true"></span>
-                                        Stock out
-                                    </span>
+                                    {% include "inventory/includes/status.html" with tone="out" label="Stock out" %}
                                 {% endif %}
                             </td>
                             {% if transaction.transaction_type == "IN" %}

@@ -1,0 +1,171 @@
+@font-face {
+    font-family: "Barlow Condensed";
+    src: url("../fonts/barlow-condensed-latin-600.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Barlow Condensed";
+    src: url("../fonts/barlow-condensed-latin-700.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    src: url("../fonts/ibm-plex-sans-latin-400.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    src: url("../fonts/ibm-plex-sans-latin-500.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "IBM Plex Sans";
+    src: url("../fonts/ibm-plex-sans-latin-600.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "IBM Plex Mono";
+    src: url("../fonts/ibm-plex-mono-latin-500.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "IBM Plex Mono";
+    src: url("../fonts/ibm-plex-mono-latin-600.woff2") format("woff2");
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+}
+
+:root,
+[data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    --case-black: #0d1012;
+    --powder-coat: #171c20;
+    --powder-coat-raised: #1d2328;
+    --rack-steel: #2c343a;
+    --rack-steel-light: #424d54;
+    --stencil-white: #e7ecef;
+    --nickel: #a4afb5;
+    --nickel-muted: #79858c;
+    --safety-orange: #d97a32;
+    --safety-orange-dark: #b85e21;
+    --healthy: #65b77a;
+    --healthy-surface: #172a1d;
+    --low: #e2aa48;
+    --low-surface: #2c2415;
+    --out: #db665f;
+    --out-surface: #301a1a;
+    --inactive: #89939a;
+    --focus-ring: #f0a05d;
+
+    --border: #354047;
+    --border-strong: #4a565e;
+    --border-soft: #273036;
+    --surface: #171c20;
+    --surface-raised: #1d2328;
+    --surface-inset: #111518;
+    --surface-hover: #20272c;
+    --text: #e7ecef;
+    --text-muted: #a4afb5;
+    --text-faint: #79858c;
+    --radius-sm: 3px;
+    --radius: 4px;
+    --radius-lg: 5px;
+    --shadow-inset: inset 0 1px 0 rgb(255 255 255 / 4%), inset 0 -1px 0 rgb(0 0 0 / 42%);
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+    --font-data: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
+
+    --bs-body-font-family: var(--font-body);
+    --bs-body-color: var(--text);
+    --bs-body-color-rgb: 231, 236, 239;
+    --bs-body-bg: var(--case-black);
+    --bs-body-bg-rgb: 13, 16, 18;
+    --bs-secondary-color: var(--text-muted);
+    --bs-secondary-bg: var(--powder-coat);
+    --bs-tertiary-bg: var(--surface-inset);
+    --bs-border-color: var(--border);
+    --bs-border-radius: var(--radius);
+    --bs-border-radius-sm: var(--radius-sm);
+    --bs-border-radius-lg: var(--radius-lg);
+    --bs-link-color: #e49452;
+    --bs-link-hover-color: #f0ab72;
+    --bs-focus-ring-color: rgb(240 160 93 / 38%);
+    --bs-form-valid-color: var(--healthy);
+    --bs-form-invalid-color: var(--out);
+    --bs-danger-text-emphasis: #f2a09a;
+}
+
+::selection {
+    color: var(--case-black);
+    background: #efad78;
+}
+
+html {
+    min-width: 320px;
+    background: var(--case-black);
+    scroll-padding-top: 80px;
+    scroll-behavior: smooth;
+}
+
+body {
+    min-width: 320px;
+    margin: 0;
+    color: var(--text);
+    background: var(--case-black);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    text-rendering: optimizeLegibility;
+    -webkit-tap-highlight-color: rgb(217 122 50 / 20%);
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+a,
+button,
+input,
+label,
+select,
+textarea {
+    touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}

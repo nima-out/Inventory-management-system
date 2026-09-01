@@ -1,21 +1,88 @@
 {% load static %}
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js" data-bs-theme="dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#0D1012">
     <title>{% block title %}Inventory{% endblock %} | Stockroom</title>
-    <link rel="stylesheet" href="{% static 'inventory/css/site.css' %}">
+    <link
+        rel="preload"
+        href="{% static 'inventory/fonts/ibm-plex-sans-latin-400.woff2' %}"
+        as="font"
+        type="font/woff2"
+        crossorigin
+    >
+    <link
+        rel="preload"
+        href="{% static 'inventory/fonts/barlow-condensed-latin-600.woff2' %}"
+        as="font"
+        type="font/woff2"
+        crossorigin
+    >
+    <link rel="stylesheet" href="{% static 'vendor/bootstrap/5.3.8/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/layout.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/pages.css' %}">
+    <script defer src="{% static 'vendor/bootstrap/5.3.8/bootstrap.bundle.min.js' %}"></script>
+    <script defer src="{% static 'inventory/js/app.js' %}"></script>
 </head>
-<body>
+<body data-page="{{ request.resolver_match.view_name|default:'public' }}">
     <a class="skip-link" href="#main-content">Skip to content</a>
+
+    {% if user.is_authenticated %}
+        <header class="mobile-bar d-lg-none">
+            <button
+                class="mobile-menu-button"
+                type="button"
+                data-bs-toggle="offcanvas"
+                data-bs-target="#primary-navigation"
+                aria-controls="primary-navigation"
+                aria-expanded="false"
+                aria-label="Open navigation"
+            >
+                <span class="menu-lines" aria-hidden="true"></span>
+                <span>Menu</span>
+            </button>
+            <a class="brand brand-mobile" href="{% url 'inventory:dashboard' %}">
+                <span class="brand-mark" aria-hidden="true"><span></span></span>
+                <span class="brand-copy" translate="no">
+                    <strong>Stockroom</strong>
+                    <small>Gear inventory</small>
+                </span>
+            </a>
+        </header>
+    {% endif %}
 
     <div class="{% if user.is_authenticated %}app-shell{% else %}public-shell{% endif %}">
         {% if user.is_authenticated %}
-            <aside class="sidebar">
+            <aside
+                class="sidebar offcanvas-lg offcanvas-start"
+                tabindex="-1"
+                id="primary-navigation"
+                aria-labelledby="primary-navigation-title"
+            >
                 <div class="sidebar-head">
-                    <a class="brand" href="{% url 'inventory:dashboard' %}">Stockroom</a>
-                    <span class="brand-description">Inventory control</span>
+                    <a class="brand" href="{% url 'inventory:dashboard' %}" id="primary-navigation-title">
+                        <span class="brand-mark" aria-hidden="true"><span></span></span>
+                        <span class="brand-copy" translate="no">
+                            <strong>Stockroom</strong>
+                            <small>Gear inventory</small>
+                        </span>
+                    </a>
+                    <button
+                        class="btn-close d-lg-none"
+                        type="button"
+                        data-bs-dismiss="offcanvas"
+                        data-bs-target="#primary-navigation"
+                        aria-label="Close navigation"
+                    ></button>
+                </div>
+
+                <div class="sidebar-plate" aria-hidden="true">
+                    <span>Inventory control</span>
+                    <span>Unit 01</span>
                 </div>
 
                 <nav class="sidebar-nav" aria-label="Primary navigation">
@@ -24,41 +91,41 @@
                             class="nav-link{% if request.resolver_match.view_name == 'inventory:dashboard' %} is-active{% endif %}"
                             href="{% url 'inventory:dashboard' %}"
                             {% if request.resolver_match.view_name == 'inventory:dashboard' %}aria-current="page"{% endif %}
-                        >Overview</a>
+                        ><span class="nav-led" aria-hidden="true"></span>Overview</a>
                         <a
                             class="nav-link{% if request.resolver_match.view_name == 'inventory:item-list' or request.resolver_match.view_name == 'inventory:item-create' or request.resolver_match.view_name == 'inventory:item-update' or request.resolver_match.view_name == 'inventory:item-archive' or request.resolver_match.view_name == 'inventory:item-reactivate' %} is-active{% endif %}"
                             href="{% url 'inventory:item-list' %}"
                             {% if request.resolver_match.view_name == 'inventory:item-list' or request.resolver_match.view_name == 'inventory:item-create' or request.resolver_match.view_name == 'inventory:item-update' or request.resolver_match.view_name == 'inventory:item-archive' or request.resolver_match.view_name == 'inventory:item-reactivate' %}aria-current="page"{% endif %}
-                        >Items</a>
+                        ><span class="nav-led" aria-hidden="true"></span>Items</a>
                     {% endif %}
                     {% if perms.inventory.view_category %}
                         <a
                             class="nav-link{% if request.resolver_match.view_name == 'inventory:category-list' or request.resolver_match.view_name == 'inventory:category-create' or request.resolver_match.view_name == 'inventory:category-update' or request.resolver_match.view_name == 'inventory:category-delete' %} is-active{% endif %}"
                             href="{% url 'inventory:category-list' %}"
                             {% if request.resolver_match.view_name == 'inventory:category-list' or request.resolver_match.view_name == 'inventory:category-create' or request.resolver_match.view_name == 'inventory:category-update' or request.resolver_match.view_name == 'inventory:category-delete' %}aria-current="page"{% endif %}
-                        >Categories</a>
+                        ><span class="nav-led" aria-hidden="true"></span>Categories</a>
                     {% endif %}
                     {% if perms.inventory.record_inventory_movement %}
                         <a
                             class="nav-link{% if request.resolver_match.view_name == 'inventory:record-movement' %} is-active{% endif %}"
                             href="{% url 'inventory:record-movement' %}"
                             {% if request.resolver_match.view_name == 'inventory:record-movement' %}aria-current="page"{% endif %}
-                        >Move stock</a>
+                        ><span class="nav-led" aria-hidden="true"></span>Move stock</a>
                     {% endif %}
                     {% if perms.inventory.view_transactionhistory %}
                         <a
                             class="nav-link{% if request.resolver_match.view_name == 'inventory:transaction-history' %} is-active{% endif %}"
                             href="{% url 'inventory:transaction-history' %}"
                             {% if request.resolver_match.view_name == 'inventory:transaction-history' %}aria-current="page"{% endif %}
-                        >History</a>
+                        ><span class="nav-led" aria-hidden="true"></span>History</a>
                     {% endif %}
                     {% if user.is_staff %}
-                        <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                        <a class="nav-link" href="{% url 'admin:index' %}"><span class="nav-led" aria-hidden="true"></span>Admin</a>
                     {% endif %}
                 </nav>
 
                 <div class="sidebar-footer">
-                    <span class="account-label">Signed in as</span>
+                    <span class="account-label">Operator</span>
                     <strong class="username">{{ user.get_username }}</strong>
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
@@ -68,17 +135,38 @@
             </aside>
         {% else %}
             <header class="public-header">
-                <a class="brand" href="{% url 'login' %}">Stockroom</a>
-                <span class="brand-description">Inventory control</span>
+                <a class="brand" href="{% url 'login' %}">
+                    <span class="brand-mark" aria-hidden="true"><span></span></span>
+                    <span class="brand-copy" translate="no">
+                        <strong>Stockroom</strong>
+                        <small>Gear inventory</small>
+                    </span>
+                </a>
+                <span class="public-system-label">Inventory control / Unit 01</span>
             </header>
         {% endif %}
 
-        <main class="{% if user.is_authenticated %}workspace{% else %}public-workspace{% endif %}" id="main-content">
+        <main
+            class="{% if user.is_authenticated %}workspace{% else %}public-workspace{% endif %}"
+            id="main-content"
+            tabindex="-1"
+        >
             <div class="content-frame">
                 {% if messages %}
-                    <div class="messages" aria-live="polite">
+                    <div class="messages" aria-live="polite" aria-atomic="true">
                         {% for message in messages %}
-                            <div class="message{% if message.tags %} message-{{ message.tags }}{% endif %}">{{ message }}</div>
+                            <div
+                                class="alert message{% if message.tags %} message-{{ message.tags }}{% endif %} alert-dismissible fade show"
+                                role="{% if message.tags == 'error' %}alert{% else %}status{% endif %}"
+                            >
+                                <span>{{ message }}</span>
+                                <button
+                                    class="btn-close"
+                                    type="button"
+                                    data-bs-dismiss="alert"
+                                    aria-label="Dismiss message"
+                                ></button>
+                            </div>
                         {% endfor %}
                     </div>
                 {% endif %}

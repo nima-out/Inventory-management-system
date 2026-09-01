@@ -1,19 +1,19 @@
 {% if page_obj.has_other_pages %}
-    <nav class="pagination" aria-label="Pagination">
+    <nav class="inventory-pagination" aria-label="Pagination">
         <span class="pagination-summary">
             Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
         </span>
         <div class="pagination-links">
             {% if page_obj.has_previous %}
-                <a class="button button-quiet" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                <a class="btn button-quiet" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
             {% else %}
-                <span class="button button-disabled" aria-disabled="true">Previous</span>
+                <span class="btn button-disabled" aria-disabled="true">Previous</span>
             {% endif %}
 
             {% if page_obj.has_next %}
-                <a class="button button-quiet" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                <a class="btn button-quiet" href="?{% if filter_query %}{{ filter_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>
             {% else %}
-                <span class="button button-disabled" aria-disabled="true">Next</span>
+                <span class="btn button-disabled" aria-disabled="true">Next</span>
             {% endif %}
         </div>
     </nav>

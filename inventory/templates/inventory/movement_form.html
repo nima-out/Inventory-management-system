@@ -5,6 +5,7 @@
 {% block content %}
 <header class="page-heading">
     <div>
+        <span class="heading-kicker">Stock operation</span>
         <h1>Record movement</h1>
         <p>Add or remove stock. Every movement becomes part of the permanent history.</p>
     </div>
@@ -19,27 +20,20 @@
         <span>Permanent record</span>
     </div>
 
-    <form method="post" class="movement-form">
+    <form
+        method="post"
+        class="movement-form"
+        data-submit-form
+        data-dirty-guard
+    >
         {% csrf_token %}
-        {{ form.non_field_errors }}
+        {% include "inventory/includes/form_errors.html" %}
 
-        <div class="form-field">
-            <label for="{{ form.item.id_for_label }}">{{ form.item.label }}</label>
-            {{ form.item }}
-            {{ form.item.errors }}
-        </div>
+        {% include "inventory/includes/form_field.html" with field=form.item %}
 
         <div class="movement-form-row">
-            <div class="form-field">
-                <label for="{{ form.transaction_type.id_for_label }}">{{ form.transaction_type.label }}</label>
-                {{ form.transaction_type }}
-                {{ form.transaction_type.errors }}
-            </div>
-            <div class="form-field">
-                <label for="{{ form.quantity.id_for_label }}">{{ form.quantity.label }}</label>
-                {{ form.quantity }}
-                {{ form.quantity.errors }}
-            </div>
+            {% include "inventory/includes/form_field.html" with field=form.transaction_type %}
+            {% include "inventory/includes/form_field.html" with field=form.quantity %}
         </div>
 
         <p class="movement-guidance">
@@ -47,8 +41,8 @@
         </p>
 
         <div class="movement-actions">
-            <button class="button button-primary" type="submit">Record movement</button>
-            <a class="button button-quiet" href="{% url 'inventory:item-list' %}">Cancel</a>
+            {% include "inventory/includes/submit_button.html" with label="Record movement" busy_label="Recording movement…" button_class="button-primary" %}
+            <a class="btn button-quiet" href="{% url 'inventory:item-list' %}" data-cancel-form>Cancel</a>
         </div>
     </form>
 </section>
